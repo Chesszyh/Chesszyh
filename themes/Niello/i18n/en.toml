@@ -1,0 +1,80 @@
+[sitename]
+other = "Niello - Hugo Theme"
+
+[siteslogan]
+other = "Your site slogan."
+
+[siteseokeywords]
+other = "SEO keywords"
+
+[siteseodescription]
+other = "SEO description"
+
+[search]
+other = "Search"
+
+[searchplaceholder]
+other = "Input Keywords..."
+
+[searching]
+other = "Searching..."
+
+[keywordmissing]
+other = "Please enter a word or phrase above to search."
+
+[nomatch]
+other = "No matches found"
+
+[home]
+other = "Home"
+
+[next]
+other = "Next >>"
+
+[previous]
+other = "<< Previous"
+
+[recommendpost]
+other = "Recommend Posts"
+
+[intro]
+other = "About"
+
+[topost]
+other = "Latest Post"
+
+[topcat]
+other = "Hot Categories"
+
+[toptag]
+other = "Top Tags"
+
+[archive]
+other = "Archive Analytics"
+
+[contact]
+other = "Contact"
+
+[emptypost]
+other = "No Regular Posts"
+
+[emptycat]
+other = "No Categories"
+
+[emptytag]
+other = "No Tags"
+
+[emptyarchive]
+other = "No Archives"
+
+[missing404title]
+other = "Page not found"
+
+[missing404body]
+other = "Sorry, we couldn’t find the page you’re looking for."
+
+[articlelink]
+other = "Page link"
+
+[archivefmt]
+other = "Jan, 2006"
