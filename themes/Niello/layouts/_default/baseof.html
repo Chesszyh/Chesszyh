@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="{{ or site.Language.LanguageCode site.Language.Lang }}"
+    dir="{{ or site.Language.LanguageDirection `ltr` }}">
+{{- partial "head.html" . -}}
+
+<body>
+    <div class="
+        mx-auto max-w-[calc(120rem)]
+        min-h-screen
+        2xl:px-[calc(16rem)]
+        xl:px-24
+        md:px-8
+        px-4
+    ">
+
+        {{ partial "nav.html" . }}
+
+        {{ partial "header.html" . }}
+
+        <div class="
+            flex flex-col overflow-hidden
+            xl:px-0
+            lg:flex-row lg:space-x-8
+        ">
+            <main class="w-full overflow-hidden">
+                {{ block "main" . }}{{ end }}
+            </main>
+
+            {{ partial "sidebar.html" . }}
+        </div>
+
+        {{ partial "footer.html" . }}
+
+        {{ partial "cookie.html" . }}
+
+    </div>
+</body>
+
+</html>

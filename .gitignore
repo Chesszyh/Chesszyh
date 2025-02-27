@@ -1,0 +1,18 @@
+*.toml
+
+# Hugo default output directory
+/public/
+/resources/_gen/
+
+# Hugo cache
+.hugo_build.lock
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo

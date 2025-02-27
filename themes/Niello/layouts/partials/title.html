@@ -1,0 +1,7 @@
+<title>
+    {{ if .IsHome }}
+    {{ i18n "sitename" }}
+    {{ else }}
+    {{ .Title }} - {{ i18n "sitename" }}
+    {{ end }}
+</title>

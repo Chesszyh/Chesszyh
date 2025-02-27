@@ -1,0 +1,19 @@
+{{ define "main" }}
+
+<div class="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-10 lg:mx-0 lg:max-w-none lg:grid-cols-1">
+    <article class="flex max-w-full flex-col">
+        <img src="/image/common-404.webp" class="w-full h-96 object-cover rounded-lg" alt="404 page">
+        <div class="flex-1 pl-0">
+            <div class="group relative">
+                <div class="text-center py-16">
+                    <p class="text-8xl font-bold text-red-500">404</p>
+                    <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-600 sm:text-5xl">{{ i18n
+                        "missing404title" }}</h1>
+                    <p class="mt-6 text-2xl leading-7 text-gray-600">{{ i18n "missing404body" }}</p>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>
+
+{{ end }}

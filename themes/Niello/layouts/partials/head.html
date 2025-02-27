@@ -1,0 +1,46 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1">
+    {{ partial "title.html" . }}
+    {{ $keywords := i18n "siteseokeywords" }}
+    {{ $description := i18n "siteseodescription" }}
+    {{ if not .IsHome }}
+    {{ with .Keywords }}
+    {{ $keywords = delimit . " , " }}
+    {{ end }}
+    {{ with .Description }}
+    {{ $description = . }}
+    {{ end }}
+    {{ end }}
+    <meta name="keywords" content="{{ $keywords }}">
+    <meta name="description" content="{{ $description }}">
+    <link rel="canonical" href="{{ .Page.Permalink }}" />
+    <link rel="icon" href="/favicon.ico?v={{ now.Unix }}" type="image/x-icon">
+    {{ partialCached "head/css.html" . }}
+    {{ partialCached "head/js.html" . }}
+
+    <!-- Google Adsense -->
+    {{ if .Site.Params.google.google_ad_client }}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ .Site.Params.google.google_ad_client }}" crossorigin="anonymous"></script>
+    {{ end }}
+
+    <!-- Google GA4 -->
+    {{ if .Site.Params.google.ga4 }}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ .Site.Params.ga4 }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', '{{ .Site.Params.google.ga4 }}');
+    </script>
+    {{ end }}
+
+    <!-- ShareThis -->
+    {{ if .Site.Params.share.sharethis }}
+    <script type="text/javascript"
+        src="https://platform-api.sharethis.com/js/sharethis.js#property={{- .Site.Params.sharethis -}}&product=sticky-share-buttons"
+        async="async"></script>
+    {{ end }}
+</head>

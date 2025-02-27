@@ -1,0 +1,36 @@
+{{ define "main" }}
+
+<article class="single-article">
+    <!--
+<img src="/img/lemon.webp" alt="" class="w-full h-96 object-cover rounded-lg">
+-->
+    <div class="group relative">
+        <h1 class="text-3xl font-medium leading-10 text-gray-400 hover:text-gray-100">
+            <a href="{{ .RelPermalink }}">
+                {{ .Title }}
+            </a>
+        </h1>
+        <time datetime="2025-03-16" class="flex items-center py-2 text-xl text-gray-600">
+            {{ .PublishDate.Format "2006-01-02 15:04" }}
+            &nbsp;&nbsp;|&nbsp;&nbsp;{{ .ReadingTime }} minute read
+        </time>
+
+        <div
+            class="mt-1 lg:pb-10 px-2 text-2xl leading-10 font-thin text-gray-500 overflow-hidden break-words article-body">
+            {{
+            .Content |
+            safeHTML }}
+        </div>
+    </div>
+    <div class="text-gray-500 text-lg">
+        {{ i18n "articlelink" }}:&nbsp;<a href="{{ .Permalink }}"
+            class="border-b border-b-gray-500 hover:text-gray-400">{{
+            .Permalink }}</a>
+    </div>
+    
+    {{ if .Site.Params.Disqus.Shortname }}
+        {{ partial "disqus.html" . }}
+    {{ end }}
+</article>
+
+{{ end }}
