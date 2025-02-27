@@ -1,0 +1,42 @@
+.lava-lamp-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 120px;
+    height: 200px;
+    z-index: 9999;
+    cursor: pointer;
+    border-radius: 60px 60px 30px 30px;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.lava-lamp-container:hover {
+    transform: scale(1.05);
+}
+
+.lava-lamp-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 60px 60px 30px 30px;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.lava-lamp-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 60px 60px 30px 30px;
+}
+
+/* 点击动画效果 */
+.pulse {
+    animation: pulse-animation 0.5s ease;
+}
+
+@keyframes pulse-animation {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}

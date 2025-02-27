@@ -1,6 +1,6 @@
 ---
 title: "Hugo"
-date: 2023-11-20T12:00:00+08:00
+date: 2025-02-27T23:32:00+08:00
 draft: false
 categories: ["笔记"]
 tags: ["Hugo", "GitHub Pages", "Web"]
