@@ -31,6 +31,22 @@
         crossorigin="anonymous"></script>
     {{ end }}
 
-    <!-- Google GA4 - 已禁用跟踪 -->
-    <!-- ShareThis - 已禁用 -->
+    <!-- Google GA4 -->
+    {{ if .Site.Params.google.ga4 }}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ .Site.Params.ga4 }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', '{{ .Site.Params.google.ga4 }}');
+    </script>
+    {{ end }}
+
+    <!-- ShareThis -->
+    {{ if .Site.Params.share.sharethis }}
+    <script type="text/javascript"
+        src="https://platform-api.sharethis.com/js/sharethis.js#property={{- .Site.Params.sharethis -}}&product=sticky-share-buttons"
+        async="async"></script>
+    {{ end }}
 </head>
