@@ -1,11 +1,80 @@
 [sitename]
-other = "代码轨迹"
+other = "Niello - Hugo Theme 模版"
 
 [siteslogan]
-other = "发现问题，分享解决方案"
+other = "您的站点宣传语。"
 
 [siteseokeywords]
-other = "编程, 代码, 开发, 软件工程, 教程, Bug修复, 代码解决方案"
+other = "SEO keywords"
 
 [siteseodescription]
-other = "一个开发者的日志，记录编码挑战和解决方案 - 分享知识帮助其他程序员克服技术障碍。"
+other = "SEO description"
+
+[search]
+other = "搜索"
+
+[searchplaceholder]
+other = "输入关键词..."
+
+[searching]
+other = "正在搜索..."
+
+[keywordmissing]
+other = "请输入搜索关键词!"
+
+[nomatch]
+other = "未找到相关内容!"
+
+[home]
+other = "首页"
+
+[next]
+other = "下一页 >>"
+
+[previous]
+other = "<< 上一页"
+
+[recommendpost]
+other = "推荐文章"
+
+[intro]
+other = "关于我们"
+
+[topost]
+other = "最近发布"
+
+[topcat]
+other = "热门分类"
+
+[toptag]
+other = "热门标签"
+
+[archive]
+other = "归档统计"
+
+[contact]
+other = "联系方式"
+
+[emptypost]
+other = "未发现常规内容"
+
+[emptycat]
+other = "未发现分类"
+
+[emptytag]
+other = "未发现标签"
+
+[emptyarchive]
+other = "未发现归档"
+
+[missing404title]
+other = "抱歉"
+
+[missing404body]
+other = "页面不存在"
+
+[articlelink]
+other = "文章链接"
+
+[archivefmt]
+other = "2006年01月"

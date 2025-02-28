@@ -7,20 +7,28 @@
     z-index: 9999;
     cursor: pointer;
     border-radius: 60px 60px 30px 30px;
-    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+    box-shadow: 0 5px 25px rgba(128, 0, 128, 0.4);
     overflow: hidden;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+    background-color: rgba(20, 10, 30, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
 }
 
 .lava-lamp-container:hover {
     transform: scale(1.05);
+    box-shadow: 0 8px 35px rgba(170, 0, 255, 0.6);
+}
+
+.lava-lamp-container:active {
+    transform: scale(0.95);
 }
 
 .lava-lamp-canvas {
     width: 100%;
     height: 100%;
     border-radius: 60px 60px 30px 30px;
-    background: rgba(0, 0, 0, 0.7);
+    display: block;
 }
 
 .lava-lamp-image {
@@ -31,12 +39,62 @@
 }
 
 /* 点击动画效果 */
-.pulse {
-    animation: pulse-animation 0.5s ease;
+@keyframes pulse-animation {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 5px 25px rgba(128, 0, 128, 0.4);
+    }
+
+    30% {
+        transform: scale(1.1);
+        box-shadow: 0 5px 30px rgba(170, 0, 255, 0.8);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 5px 25px rgba(128, 0, 128, 0.4);
+    }
 }
 
-@keyframes pulse-animation {
-    0% { transform: scale(1); }
-    30% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+.pulse {
+    animation: pulse-animation 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 移动设备适配 */
+@media (max-width: 768px) {
+    .lava-lamp-container {
+        width: 100px;
+        height: 160px;
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* 添加玻璃质感 */
+.lava-lamp-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 30%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.15),
+            rgba(255, 255, 255, 0.05));
+    pointer-events: none;
+}
+
+/* 添加底座高光 */
+.lava-lamp-container::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 15%;
+    background: linear-gradient(0deg,
+            rgba(80, 20, 100, 0.9),
+            rgba(40, 20, 60, 0.5));
+    border-radius: 0 0 30px 30px;
+    pointer-events: none;
 }

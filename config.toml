@@ -4,8 +4,6 @@ defaultContentLanguageInSubdir = true
 
 staticDir = ["static", "static"]
 
-theme = "Niello"
-
 [module]
 [module.hugoVersion]
 min = "0.100.0"
@@ -33,7 +31,7 @@ name = 'Contact'
 pageRef = '/contact'
 weight = 4
 [languages.zh]
-title = "idk."
+title = "CodeTrace"
 languageCode = "zh-cn"
 LanguageName = "🇨🇳CN"
 contentDir = "content/zh"
