@@ -1,5 +1,5 @@
 baseURL = "https://Chesszyh.github.io/"
-defaultContentLanguage = "zh"
+defaultContentLanguage = "en"
 defaultContentLanguageInSubdir = true
 
 staticDir = ["static"]  
