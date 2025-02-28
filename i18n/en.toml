@@ -1,15 +1,14 @@
 [sitename]
-other = "idk"
+other = "CodeTrace"
 
 [siteslogan]
-other = ""
+other = "Chesszyh's Personal Blog"
 
 [siteseokeywords]
-other = "chesszyh"
+other = "Computer Science, AI, LLM, Deep Learning, C++"
 
 [siteseodescription]
-other = "chesszyh's blog"
-
+other = "chesszyh's Blog, providing learning notes and technical sharing in the fields of CS/LLM."
 [search]
 other = "Search"
 

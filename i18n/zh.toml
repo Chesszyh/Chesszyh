@@ -1,14 +1,14 @@
 [sitename]
-other = "Niello - Hugo Theme 模版"
+other = "CodeTrace"
 
 [siteslogan]
-other = "您的站点宣传语。"
+other = "Chesszyh's Personal Blog"
 
 [siteseokeywords]
-other = "SEO keywords"
+other = "Computer Science, AI, LLM, Deep Learning, C++"
 
 [siteseodescription]
-other = "SEO description"
+other = "Chesszyh's Blog，提供CS/LLM等领域的学习笔记与技术分享。"
 
 [search]
 other = "搜索"

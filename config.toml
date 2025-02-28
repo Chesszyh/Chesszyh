@@ -13,7 +13,7 @@ title = "{CodeTrace} - Discover Issues, Share Solutions."
 languageCode = "en-us"
 LanguageName = "🇺🇸EN"
 contentDir = "content/en"
-weight = 2
+weight = 1
 [[languages.en.menus.main]]
 name = 'Home'
 pageRef = '/'
@@ -35,7 +35,7 @@ title = "CodeTrace"
 languageCode = "zh-cn"
 LanguageName = "🇨🇳CN"
 contentDir = "content/zh"
-weight = 1
+weight = 2
 [[languages.zh.menus.main]]
 name = '首页'
 pageRef = '/'
@@ -56,7 +56,7 @@ weight = 4
 [params]
 [params.google]
 google_ad_client = ""
-ga4 = ""
+ga4 = "G-KRJ7MGKP6J"
 [params.bannershowcase]
 categories = ["AI"]
 limit = 2
@@ -68,8 +68,6 @@ categories = ["privacy", "terms", "archives", "cookie"]
 copyright = ""
 [params.share]
 sharethis = ""
-[params.disqus]
-shortname = ""
 
 [outputs]
 home = ["HTML", "JSON"]
