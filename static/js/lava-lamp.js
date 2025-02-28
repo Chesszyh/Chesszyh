@@ -5,16 +5,42 @@ class LavaLamp {
         this.width = options.width || 120;
         this.height = options.height || 200;
         this.fallbackImage = options.fallbackImage || '/image/lavalamp.png';
-        this.audio = options.audio || new Audio('/audio/vine-boom.mp3');
+        this.audioSrc = options.audio ? options.audio.src : '/audio/vine-boom.mp3';
         this.memoryMode = options.memoryMode || false;
         this.numBlobs = options.numBlobs || 8;
+
+        // 可自定义的视觉效果参数
+        this.visuals = {
+            // 气泡相关参数
+            blobMinRadius: options.blobMinRadius || 15,
+            blobMaxRadius: options.blobMaxRadius || 40,
+            blobSpeed: options.blobSpeed || 1.0,  // 速度倍率
+            blobWaveAmplitude: options.blobWaveAmplitude || 0.8,  // 波动幅度
+            blobOpacity: options.blobOpacity || 0.8,  // 气泡不透明度
+
+            // 颜色相关参数
+            baseHue: options.baseHue || 240,  // 基础色调
+            colorVariance: options.colorVariance || 20,  // 色调变化范围
+            colorTransitionSpeed: options.colorTransitionSpeed || 0.05,  // 颜色变化速度
+
+            // 背景和容器相关参数
+            backgroundColor: options.backgroundColor || 'rgba(10, 5, 15, 0.9)',
+            glassOpacity: options.glassOpacity || 0.1,  // 玻璃反光效果不透明度
+            shadowIntensity: options.shadowIntensity || 0.4  // 阴影强度
+        };
+
+        // 音频播放器池初始化
+        this.audioPool = [];
+        this.audioPoolSize = 5; // 允许5个音效同时播放
+        this.currentAudioIndex = 0;
+        this.initAudioPool();
 
         // 拖拽状态变量
         this.isDragging = false;
         this.dragOffsetX = 0;
         this.dragOffsetY = 0;
-        this.isMinimized = false;
-        this.originalHeight = this.height;
+        this.dragStartX = 0;
+        this.dragStartY = 0;
 
         // 页面活动监控
         this.lastUserActivity = Date.now();
@@ -23,9 +49,9 @@ class LavaLamp {
 
         // 内存利用率历史记录
         this.memoryHistory = [];
-        this.colorTransitionSpeed = 0.05; // 颜色变化速度
-        this.currentBaseHue = 240; // 初始蓝色
-        this.targetBaseHue = 240;
+        this.colorTransitionSpeed = this.visuals.colorTransitionSpeed;
+        this.currentBaseHue = this.visuals.baseHue;
+        this.targetBaseHue = this.visuals.baseHue;
 
         // 恢复位置
         this.loadPosition();
@@ -54,6 +80,32 @@ class LavaLamp {
         if (options.debug) {
             this.container.appendChild(this.debugInfo);
         }
+
+        // 注册重新加载事件 - 用于恢复熔岩灯
+        document.addEventListener('reloadLavaLamp', this.handleReload.bind(this));
+    }
+
+    // 音频池初始化
+    initAudioPool() {
+        for (let i = 0; i < this.audioPoolSize; i++) {
+            const audio = new Audio(this.audioSrc);
+            audio.preload = 'auto';
+            audio.volume = 0.7;
+            this.audioPool.push(audio);
+        }
+    }
+
+    // 播放音频（支持堆叠）
+    playAudio() {
+        // 获取下一个可用的音频实例
+        const audio = this.audioPool[this.currentAudioIndex];
+
+        // 重置音频并播放
+        audio.currentTime = 0;
+        audio.play().catch(e => console.warn("无法播放音效:", e));
+
+        // 更新索引，循环使用音频池
+        this.currentAudioIndex = (this.currentAudioIndex + 1) % this.audioPoolSize;
     }
 
     // 创建UI元素
@@ -76,12 +128,6 @@ class LavaLamp {
         this.controls = document.createElement('div');
         this.controls.className = 'lava-lamp-controls';
 
-        // 最小化按钮
-        this.minimizeBtn = document.createElement('button');
-        this.minimizeBtn.className = 'lava-lamp-minimize';
-        this.minimizeBtn.innerHTML = '−';
-        this.minimizeBtn.title = '最小化';
-
         // 关闭按钮
         this.closeBtn = document.createElement('button');
         this.closeBtn.className = 'lava-lamp-close';
@@ -89,7 +135,6 @@ class LavaLamp {
         this.closeBtn.title = '关闭';
 
         // 添加按钮到控制面板
-        this.controls.appendChild(this.minimizeBtn);
         this.controls.appendChild(this.closeBtn);
 
         // 提示条
@@ -103,30 +148,29 @@ class LavaLamp {
         this.container.appendChild(this.controls);
         this.container.appendChild(this.tooltip);
 
-        // 添加拖动句柄
+        // 添加拖动句柄 - 覆盖整个容器以提高拖动灵敏度
         this.dragHandle = document.createElement('div');
         this.dragHandle.className = 'lava-lamp-drag-handle';
         this.container.appendChild(this.dragHandle);
     }
 
-    // 设置交互事件
+    // 设置交互事件 - 优化拖拽性能
     setupEvents() {
-        // 拖拽事件
-        this.dragHandle.addEventListener('mousedown', this.startDrag.bind(this));
-        document.addEventListener('mousemove', this.onDrag.bind(this));
+        // 拖拽事件 - 整个容器可拖拽，提高灵敏度
+        this.container.addEventListener('mousedown', this.startDrag.bind(this));
+        document.addEventListener('mousemove', this.onDrag.bind(this), { passive: false });
         document.addEventListener('mouseup', this.stopDrag.bind(this));
 
         // 触摸事件支持
-        this.dragHandle.addEventListener('touchstart', this.startDrag.bind(this), { passive: false });
+        this.container.addEventListener('touchstart', this.startDrag.bind(this), { passive: false });
         document.addEventListener('touchmove', this.onDrag.bind(this), { passive: false });
         document.addEventListener('touchend', this.stopDrag.bind(this));
 
-        // 熔岩灯点击事件
+        // 熔岩灯点击事件 - 只处理非拖拽的点击
         this.canvas.addEventListener('click', this.handleClick.bind(this));
         this.canvas.addEventListener('dblclick', this.handleDoubleClick.bind(this));
 
         // 控制按钮事件
-        this.minimizeBtn.addEventListener('click', this.toggleMinimize.bind(this));
         this.closeBtn.addEventListener('click', this.close.bind(this));
 
         // 显示/隐藏控制面板
@@ -149,6 +193,31 @@ class LavaLamp {
         window.addEventListener('resize', this.onWindowResize.bind(this));
     }
 
+    // 处理重新加载熔岩灯事件
+    handleReload() {
+        // 显示熔岩灯
+        this.container.style.display = 'block';
+
+        // 重置关闭状态
+        localStorage.removeItem('lava-lamp-closed');
+
+        // 动画效果
+        this.container.classList.add('appear');
+        setTimeout(() => {
+            this.container.classList.remove('appear');
+        }, 500);
+
+        // 重置位置
+        this.loadPosition();
+
+        // 气泡动画效果
+        if (this.blobs) {
+            this.blobs.forEach(blob => {
+                blob.speedY = -1 - Math.random();
+            });
+        }
+    }
+
     // 检查Canvas是否受支持
     isCanvasSupported() {
         const canvas = document.createElement('canvas');
@@ -163,12 +232,12 @@ class LavaLamp {
             this.blobs.push({
                 x: Math.random() * this.width,
                 y: this.height - Math.random() * this.height / 2,
-                radius: 15 + Math.random() * 25,
+                radius: this.visuals.blobMinRadius + Math.random() * (this.visuals.blobMaxRadius - this.visuals.blobMinRadius),
                 speedX: Math.random() * 1 - 0.5,
                 speedY: -0.3 - Math.random() * 0.7,
                 color: this.getRandomColorWithBaseHue(this.currentBaseHue),
                 phase: Math.random() * Math.PI * 2, // 用于波动效果
-                amplitude: 0.2 + Math.random() * 0.8, // 波动幅度
+                amplitude: this.visuals.blobWaveAmplitude * (0.2 + Math.random() * 0.8), // 波动幅度
                 targetRadius: null, // 动态大小变化目标
                 originalRadius: null // 原始大小记录
             });
@@ -181,9 +250,9 @@ class LavaLamp {
 
         // 容器外观
         this.glassGradient = this.ctx.createLinearGradient(0, 0, this.width, 0);
-        this.glassGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
-        this.glassGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
-        this.glassGradient.addColorStop(1, 'rgba(255, 255, 255, 0.15)');
+        this.glassGradient.addColorStop(0, `rgba(255, 255, 255, ${this.visuals.glassOpacity})`);
+        this.glassGradient.addColorStop(0.5, `rgba(255, 255, 255, ${this.visuals.glassOpacity / 2})`);
+        this.glassGradient.addColorStop(1, `rgba(255, 255, 255, ${this.visuals.glassOpacity * 1.5})`);
 
         // 启动动画
         this.lastTime = performance.now();
@@ -193,20 +262,31 @@ class LavaLamp {
         this.memoryUpdateInterval = setInterval(() => this.updateMemoryAndColors(), 1000);
     }
 
-    // 拖拽开始
+    // 优化的拖拽开始
     startDrag(e) {
+        // 如果点击的是控制按钮，不启动拖拽
+        if (e.target === this.closeBtn) {
+            return;
+        }
+
         e.preventDefault();
         this.isDragging = true;
+        this.recentDragStart = Date.now();
 
         // 获取点击/触摸的位置
         const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
         const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
 
+        // 保存容器当前位置和鼠标起始位置
         const rect = this.container.getBoundingClientRect();
         this.dragOffsetX = clientX - rect.left;
         this.dragOffsetY = clientY - rect.top;
+        this.dragStartX = rect.left;
+        this.dragStartY = rect.top;
 
-        // 添加拖动中的样式
+        // 添加拖动中的样式 - 使用CSS变量存储初始位置
+        this.container.style.setProperty('--drag-start-x', `${rect.left}px`);
+        this.container.style.setProperty('--drag-start-y', `${rect.top}px`);
         this.container.classList.add('dragging');
 
         // 波动所有气泡
@@ -218,7 +298,7 @@ class LavaLamp {
         }
     }
 
-    // 拖拽中
+    // 优化的拖拽中处理 - 使用transform以提高性能
     onDrag(e) {
         if (!this.isDragging) return;
         e.preventDefault();
@@ -241,14 +321,11 @@ class LavaLamp {
         newLeft = Math.max(0, Math.min(windowWidth - containerWidth, newLeft));
         newTop = Math.max(0, Math.min(windowHeight - containerHeight, newTop));
 
-        // 设置新位置
+        // 使用transform进行移动，性能更好
         this.container.style.left = `${newLeft}px`;
         this.container.style.top = `${newTop}px`;
         this.container.style.right = 'auto';
         this.container.style.bottom = 'auto';
-
-        // 记录位置
-        this.savePosition();
 
         // 移动时摇晃气泡
         if (this.blobs) {
@@ -263,6 +340,9 @@ class LavaLamp {
         if (this.isDragging) {
             this.isDragging = false;
             this.container.classList.remove('dragging');
+
+            // 判断是否是一次短暂的点击拖拽
+            this.recentlyDragged = Date.now() - this.recentDragStart < 200 ? false : true;
 
             // 保存新位置
             this.savePosition();
@@ -298,45 +378,6 @@ class LavaLamp {
         this.savePosition();
     }
 
-    // 切换最小化状态
-    toggleMinimize(e) {
-        e.stopPropagation(); // 防止事件冒泡
-
-        if (this.isMinimized) {
-            // 恢复
-            this.container.style.height = `${this.originalHeight}px`;
-            this.canvas.style.height = '100%';
-            this.minimizeBtn.innerHTML = '−';
-            this.minimizeBtn.title = '最小化';
-
-            // 气泡动画
-            if (this.blobs) {
-                this.blobs.forEach(blob => {
-                    blob.speedY = -1 - Math.random();
-                });
-            }
-        } else {
-            // 最小化
-            this.originalHeight = this.container.offsetHeight;
-            this.container.style.height = '60px';
-            this.canvas.style.height = '100%';
-            this.minimizeBtn.innerHTML = '+';
-            this.minimizeBtn.title = '恢复';
-
-            // 气泡动画
-            if (this.blobs) {
-                this.blobs.forEach(blob => {
-                    blob.y = this.height - blob.radius;
-                });
-            }
-        }
-
-        this.isMinimized = !this.isMinimized;
-
-        // 保存状态
-        localStorage.setItem('lava-lamp-minimized', this.isMinimized);
-    }
-
     // 关闭熔岩灯
     close(e) {
         e.stopPropagation(); // 防止事件冒泡
@@ -344,12 +385,10 @@ class LavaLamp {
         // 淡出动画
         this.container.classList.add('closing');
 
-        // 动画结束后移除元素
+        // 动画结束后隐藏元素
         setTimeout(() => {
-            document.body.removeChild(this.container);
-
-            // 清理计时器和事件
-            clearInterval(this.memoryUpdateInterval);
+            this.container.style.display = 'none';
+            this.container.classList.remove('closing');
 
             // 记住关闭状态
             localStorage.setItem('lava-lamp-closed', 'true');
@@ -361,6 +400,12 @@ class LavaLamp {
 
     // 创建恢复按钮
     createRestoreButton() {
+        // 移除之前的恢复按钮（如果有）
+        const existingBtn = document.querySelector('.lava-lamp-restore');
+        if (existingBtn) {
+            existingBtn.remove();
+        }
+
         const restoreBtn = document.createElement('button');
         restoreBtn.className = 'lava-lamp-restore';
         restoreBtn.innerHTML = '恢复熔岩灯';
@@ -372,20 +417,17 @@ class LavaLamp {
             // 移除恢复按钮
             document.body.removeChild(restoreBtn);
 
-            // 重置关闭状态
-            localStorage.removeItem('lava-lamp-closed');
-
-            // 重新初始化熔岩灯
-            document.dispatchEvent(new Event('reloadLavaLamp'));
+            // 触发恢复事件
+            document.dispatchEvent(new CustomEvent('reloadLavaLamp'));
         });
     }
 
     // 随机颜色生成 - 基于色调
-    getRandomColorWithBaseHue(baseHue, variance = 20) {
+    getRandomColorWithBaseHue(baseHue, variance = this.visuals.colorVariance) {
         const hue = baseHue + (Math.random() - 0.5) * variance * 2;
         const saturation = 70 + Math.random() * 30;
         const lightness = 50 + Math.random() * 30;
-        return `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`;
+        return `hsla(${hue}, ${saturation}%, ${lightness}%, ${this.visuals.blobOpacity})`;
     }
 
     // 更新内存数据和颜色
@@ -502,11 +544,8 @@ class LavaLamp {
             return;
         }
 
-        // 播放音效
-        if (this.audio) {
-            this.audio.currentTime = 0;
-            this.audio.play().catch(e => console.warn("无法播放音效:", e));
-        }
+        // 播放音效 - 使用音频池
+        this.playAudio();
 
         // 点击特效
         this.container.classList.add('pulse');
@@ -591,11 +630,6 @@ class LavaLamp {
     handleDoubleClick(e) {
         e.preventDefault();
 
-        // 重置熔岩灯状态
-        if (this.isMinimized) {
-            this.toggleMinimize(e);
-        }
-
         // 所有气泡爆发向上
         this.blobs.forEach(blob => {
             blob.speedY = -3 - Math.random() * 2;
@@ -613,15 +647,18 @@ class LavaLamp {
         this.currentBaseHue = Math.random() * 360;
         this.targetBaseHue = this.currentBaseHue;
 
-        // 播放音效（更大声）
-        if (this.audio) {
-            this.audio.volume = 1.0; // 最大音量
-            this.audio.currentTime = 0;
-            this.audio.play().catch(e => console.warn("无法播放音效:", e));
-            setTimeout(() => {
-                this.audio.volume = 0.7; // 恢复正常音量
-            }, 1000);
-        }
+        // 播放音效（更大声）- 使用音频池
+        const audio = this.audioPool[this.currentAudioIndex];
+        audio.volume = 1.0; // 最大音量
+        audio.currentTime = 0;
+        audio.play().catch(e => console.warn("无法播放音效:", e));
+
+        this.currentAudioIndex = (this.currentAudioIndex + 1) % this.audioPoolSize;
+
+        setTimeout(() => {
+            // 恢复其他音频实例的正常音量
+            this.audioPool.forEach(a => a.volume = 0.7);
+        }, 1000);
     }
 
     // 保存位置到本地存储
@@ -652,20 +689,6 @@ class LavaLamp {
                     this.createRestoreButton();
                 }, 0);
                 return;
-            }
-
-            // 检查最小化状态
-            this.isMinimized = localStorage.getItem('lava-lamp-minimized') === 'true';
-            if (this.isMinimized) {
-                // 延迟最小化，以便先完成构造
-                setTimeout(() => {
-                    this.originalHeight = this.height;
-                    this.container.style.height = '60px';
-                    if (this.minimizeBtn) {
-                        this.minimizeBtn.innerHTML = '+';
-                        this.minimizeBtn.title = '恢复';
-                    }
-                }, 0);
             }
 
             // 检查保存的位置
@@ -710,7 +733,7 @@ class LavaLamp {
         this.ctx.clearRect(0, 0, this.width, this.height);
 
         // 绘制熔岩灯背景
-        this.ctx.fillStyle = 'rgba(10, 5, 15, 0.9)';
+        this.ctx.fillStyle = this.visuals.backgroundColor;
         this.ctx.fillRect(0, 0, this.width, this.height);
 
         // 绘制底座
@@ -737,10 +760,10 @@ class LavaLamp {
                 blob.speedX = -Math.abs(blob.speedX) * 0.8;
             }
 
-            // 当到达顶部时逐渐下沉
+            // 当到达顶部时逐渐下沉 - 增加重力因素
             if (blob.y < blob.radius) {
-                blob.speedY = Math.abs(blob.speedY) * 0.2;
                 blob.y = blob.radius;
+                blob.speedY = Math.abs(blob.speedY) * 0.3; // 轻微弹跳
             }
 
             // 当到达底部时上升
@@ -752,6 +775,9 @@ class LavaLamp {
             // 减速 (模拟阻力)
             blob.speedX *= 0.99;
             blob.speedY *= 0.98;
+
+            // 添加重力效果 - 确保气泡最终会下沉
+            blob.speedY += 0.03 * deltaTime * 60;
 
             // 随机移动
             if (Math.random() < 0.01) {
@@ -810,11 +836,21 @@ document.addEventListener('DOMContentLoaded', () => {
     lavaLampContainer.className = 'lava-lamp-container';
     document.body.appendChild(lavaLampContainer);
 
-    // 创建音频元素
-    const audio = new Audio('/audio/vine-boom.mp3');
-
-    // 尝试预加载音频
-    audio.preload = 'auto';
+    // 添加CSS样式来优化拖拽性能
+    const style = document.createElement('style');
+    style.textContent = `
+        .lava-lamp-container {
+            position: fixed;
+            z-index: 9999;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .lava-lamp-container.dragging {
+            transition: none !important;
+            cursor: grabbing;
+        }
+    `;
+    document.head.appendChild(style);
 
     // 初始化熔岩灯
     new LavaLamp({
@@ -822,7 +858,7 @@ document.addEventListener('DOMContentLoaded', () => {
         width: 120,
         height: 200,
         fallbackImage: '/image/lavalamp.png',
-        audio: audio,
+        audio: new Audio('/audio/vine-boom.mp3'), // 仅用于传递路径
         memoryMode: true, // 内存模式
         numBlobs: 8
     });
