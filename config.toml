@@ -1,8 +1,8 @@
 baseURL = "https://Chesszyh.github.io/"
-defaultContentLanguage = "en"
+defaultContentLanguage = "zh"
 defaultContentLanguageInSubdir = true
 
-staticDir = ["static", "static"]
+staticDir = ["static"]  
 
 [module]
 [module.hugoVersion]
@@ -13,7 +13,7 @@ title = "{CodeTrace} - Discover Issues, Share Solutions."
 languageCode = "en-us"
 LanguageName = "🇺🇸EN"
 contentDir = "content/en"
-weight = 1
+weight = 2
 [[languages.en.menus.main]]
 name = 'Home'
 pageRef = '/'
@@ -35,7 +35,7 @@ title = "CodeTrace"
 languageCode = "zh-cn"
 LanguageName = "🇨🇳CN"
 contentDir = "content/zh"
-weight = 2
+weight = 1
 [[languages.zh.menus.main]]
 name = '首页'
 pageRef = '/'
@@ -65,7 +65,7 @@ contact = "chesszyh987@gmail.com"
 [params.ignore]
 categories = ["privacy", "terms", "archives", "cookie"]
 [params.license]
-copyright = "&#xA9; 2019 ~ 2025 by guangmean. All Rights Reserved."
+copyright = ""
 [params.share]
 sharethis = ""
 [params.disqus]
